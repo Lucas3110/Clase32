@@ -1,6 +1,7 @@
 const db = require('../database/models');
 const sequelize = db.sequelize;
 
+const Movies = db.Movie;
 
 const moviesController = {
     'list': (req, res) => {
@@ -38,7 +39,60 @@ const moviesController = {
             .then(movies => {
                 res.render('recommendedMovies.ejs', {movies});
             });
+    }, 
+    add: function (req, res) {
+        res.render('moviesAdd.ejs');
+    },
+    create: function (req, res) {
+        db.Movie.create({
+            title: req.body.title,
+            rating: req.body.rating,
+            awards: req.body.awards,
+            release_date: req.body.release_date,
+            length: req.body.length
+        })
+        .then(movie => {
+            res.redirect('/movies');
+         })
+    },
+    edit: function(req, res) {
+        db.Movie.findByPk(req.params.id)
+            .then(Movie => {
+                res.render('moviesEdit.ejs', {Movie})
+            })
+    },
+    update: function (req,res) {
+        db.Movie.update({
+            title: req.body.title,
+            rating: req.body.rating,
+            awards: req.body.awards,
+            release_date: req.body.release_date,
+            length: req.body.length
+        },
+        {
+            where: {id: req.params.id}
+        })
+        .then(movie => {
+            res.redirect('/movies');
+         })
+    },
+    delete: function (req, res) {
+        db.Movie.findByPk(req.params.id)
+            .then(Movie => {
+                res.render('moviesDelete.ejs', {Movie})
+            })
+    },
+    destroy: function (req, res) {
+        db.Movie.destroy({
+            where: {
+               id: req.params.id
+            }
+         })
+         .then(() => {
+               res.redirect('/movies');
+            })
     }
+
 }
 
 module.exports = moviesController;
